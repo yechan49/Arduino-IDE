@@ -1,0 +1,14 @@
+#include <EEPROM.h>
+
+void setup() {
+  Serial.begin(9600);
+  Serial.println("Initializing EEPROM...");
+
+  for (int addr = 0; addr < EEPROM.length(); addr++) {
+    EEPROM.write(addr, 0);
+  }
+
+  Serial.println("✅ EEPROM cleared!");
+}
+
+void loop() {}
