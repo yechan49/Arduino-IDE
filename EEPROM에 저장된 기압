@@ -1,0 +1,52 @@
+#include <EEPROM.h>
+
+int buzzerPin = 8;
+float thresholdPressure = 1012.00;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(buzzerPin, OUTPUT);
+  digitalWrite(buzzerPin, HIGH);
+
+  Serial.println("EEPROM Read Pressure & Altitude...");
+
+  int addr = 0;
+  float pressure, altitude;
+  bool buzzerState = false;
+
+  while (addr + 8 <= EEPROM.length()) {
+    EEPROM.get(addr, pressure);
+    EEPROM.get(addr + 4, altitude);
+
+    if (pressure == 0 && altitude == 0) {
+      Serial.println("\n✅ No more saved data. Stopping read.");
+      break;
+    }
+
+    Serial.print("Addr ");
+    Serial.print(addr);
+    Serial.print(" -> Pressure: ");
+    Serial.print(pressure);
+    Serial.print(" hPa");
+
+    if (pressure < thresholdPressure) {
+      buzzerState = true;
+      Serial.println("⚠️ Pressure Low!");
+    } else {
+      buzzerState = false;
+      Serial.println("Buzzer OFF (Pressure normal)");
+    }
+
+    Serial.print("Buzzer state: ");
+    Serial.println(buzzerState ? "ON" : "OFF");
+    Serial.println("-----------------------");
+
+    addr += 8;
+    delay(100);
+  }
+
+  Serial.println("\n📘 EEPROM Read Complete. Program halted.");
+  while (1);
+}
+
+void loop() {}
